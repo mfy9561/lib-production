@@ -1,0 +1,1006 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LiB Production — Visual Storytellers</title>
+<link href="https://fonts.googleapis.com/css2?family=Italiana&family=Outfit:wght@200;300;400;500;600&family=Libre+Baskerville:ital,wght@0,400;0,700;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#f5f0e8;
+  --green:#0f1f12;
+  --green2:#162219;
+  --green3:#1e2e22;
+  --gold:#c9a14a;
+  --gold2:#e8c97a;
+  --muted:#8a9e8e;
+  --border:rgba(245,240,232,0.08);
+  --glass:rgba(245,240,232,0.03);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{
+  background:var(--green);color:var(--cream);
+  font-family:'Outfit',sans-serif;font-weight:300;
+  overflow-x:hidden;
+}
+::selection{background:var(--gold);color:var(--green)}
+::-webkit-scrollbar{width:2px}
+::-webkit-scrollbar-thumb{background:var(--gold)}
+
+/* ── GRAIN OVERLAY ── */
+body::before{
+  content:'';position:fixed;inset:0;z-index:1000;pointer-events:none;
+  opacity:0.035;
+  background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size:200px 200px;
+}
+
+/* ── CURSOR ── */
+#cur{
+  position:fixed;width:8px;height:8px;
+  background:var(--gold);border-radius:50%;
+  pointer-events:none;z-index:9999;
+  transform:translate(-50%,-50%);
+  transition:transform 0.05s;
+  mix-blend-mode:difference;
+}
+#cur2{
+  position:fixed;width:36px;height:36px;
+  border:1px solid rgba(201,161,74,0.6);border-radius:50%;
+  pointer-events:none;z-index:9998;
+  transform:translate(-50%,-50%);
+}
+
+/* ── NAV ── */
+nav{
+  position:fixed;top:0;left:0;right:0;z-index:600;
+  display:flex;align-items:center;justify-content:space-between;
+  padding:2rem 5vw;
+  mix-blend-mode:difference;
+}
+.logo{
+  font-family:'Italiana',serif;font-size:1.5rem;letter-spacing:0.1em;
+  color:var(--cream);text-decoration:none;
+}
+.nav-right{display:flex;align-items:center;gap:3rem}
+.nav-link{
+  text-decoration:none;color:var(--cream);
+  font-size:0.7rem;letter-spacing:0.25em;text-transform:uppercase;font-weight:500;
+  opacity:0.6;transition:opacity 0.3s;
+}
+.nav-link:hover{opacity:1}
+.nav-cta{
+  font-size:0.7rem;letter-spacing:0.2em;text-transform:uppercase;font-weight:500;
+  color:var(--green);background:var(--cream);
+  padding:0.6rem 1.4rem;text-decoration:none;
+  transition:opacity 0.3s;
+}
+.nav-cta:hover{opacity:0.85}
+
+/* ── HERO ── */
+.hero{
+  height:100vh;min-height:700px;
+  position:relative;overflow:hidden;
+  display:flex;align-items:flex-end;
+  padding:0 5vw 6vh;
+}
+.hero-bg{
+  position:absolute;inset:0;
+}
+/* SLIDESHOW */
+.slide{
+  position:absolute;inset:0;opacity:0;
+  transition:opacity 1.4s ease-in-out;
+  z-index:0;
+}
+.slide.active{opacity:1;z-index:1}
+.slide img{
+  width:100%;height:100%;object-fit:cover;
+  transform:scale(1.08);
+  transition:transform 7s ease-out;
+}
+.slide.active img{transform:scale(1.0)}
+/* slide dots */
+.slide-dots{
+  position:absolute;bottom:3rem;right:5vw;
+  display:flex;gap:0.5rem;z-index:3;
+}
+.slide-dot{
+  width:20px;height:2px;background:rgba(245,240,232,0.3);
+  cursor:pointer;transition:all 0.4s;border:none;padding:0;
+}
+.slide-dot.on{width:36px;background:var(--gold)}
+/* slide counter */
+.slide-counter{
+  position:absolute;top:50%;right:5vw;transform:translateY(-50%);
+  z-index:3;font-family:'Italiana',serif;
+  font-size:0.75rem;letter-spacing:0.2em;color:rgba(245,240,232,0.4);
+  writing-mode:vertical-rl;
+}
+@keyframes zoomout{from{transform:scale(1.08)}to{transform:scale(1.0)}}
+.hero-overlay{
+  position:absolute;inset:0;
+  background:linear-gradient(
+    to top,
+    rgba(10,18,12,0.95) 0%,
+    rgba(10,18,12,0.5) 40%,
+    rgba(10,18,12,0.1) 70%,
+    transparent 100%
+  );
+}
+.hero-content{
+  position:relative;z-index:2;width:100%;
+  display:flex;align-items:flex-end;justify-content:space-between;
+  gap:2rem;
+}
+.hero-title-wrap{}
+.hero-eyebrow{
+  font-size:0.68rem;letter-spacing:0.35em;text-transform:uppercase;
+  color:var(--gold);font-weight:500;margin-bottom:1.2rem;
+  display:flex;align-items:center;gap:0.8rem;
+  opacity:0;animation:fadein 1s 0.5s forwards;
+}
+.hero-eyebrow::before{content:'';width:24px;height:1px;background:var(--gold)}
+.hero-title{
+  font-family:'Italiana',serif;
+  font-size:clamp(4rem,10vw,9rem);
+  line-height:0.92;letter-spacing:-0.01em;
+  overflow:hidden;
+}
+.hero-title .line{
+  display:block;overflow:hidden;
+}
+.hero-title .line span{
+  display:block;
+  transform:translateY(110%);
+  animation:slideup 1s cubic-bezier(0.16,1,0.3,1) forwards;
+}
+.hero-title .line:nth-child(1) span{animation-delay:0.2s}
+.hero-title .line:nth-child(2) span{animation-delay:0.35s;color:var(--gold);font-style:italic}
+.hero-title .line:nth-child(3) span{animation-delay:0.5s}
+@keyframes slideup{from{transform:translateY(110%)}to{transform:translateY(0)}}
+@keyframes fadein{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.hero-right{
+  text-align:right;flex-shrink:0;max-width:280px;
+  opacity:0;animation:fadein 1s 1s forwards;
+}
+.hero-right p{
+  font-size:0.88rem;line-height:1.7;color:rgba(245,240,232,0.65);margin-bottom:1.5rem;
+}
+.hero-scroll{
+  display:flex;align-items:center;gap:0.8rem;justify-content:flex-end;
+  font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);
+}
+.hero-scroll-line{
+  width:40px;height:1px;background:var(--muted);
+  transform-origin:left;animation:grow 1.5s 1.5s ease-out forwards;transform:scaleX(0);
+}
+@keyframes grow{to{transform:scaleX(1)}}
+.hero-badge{
+  position:absolute;top:50%;right:5vw;transform:translateY(-50%);
+  z-index:2;
+  width:110px;height:110px;border-radius:50%;
+  border:1px solid rgba(201,161,74,0.3);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  font-size:0.62rem;letter-spacing:0.15em;text-transform:uppercase;
+  color:var(--gold);text-align:center;line-height:1.6;
+  animation:spin 20s linear infinite;
+  opacity:0;animation:fadein 1s 1.5s forwards, spin 20s 2s linear infinite;
+}
+@keyframes spin{from{transform:translateY(-50%) rotate(0deg)}to{transform:translateY(-50%) rotate(360deg)}}
+
+/* ── MARQUEE ── */
+.ticker{
+  background:var(--gold);
+  padding:0.9rem 0;overflow:hidden;white-space:nowrap;
+  position:relative;z-index:3;
+}
+.ticker-inner{display:inline-flex;gap:0;animation:tick 18s linear infinite}
+.ticker-item{
+  font-family:'Italiana',serif;font-size:1.1rem;
+  color:var(--green);padding:0 2.5rem;
+  display:flex;align-items:center;gap:2.5rem;
+}
+.ticker-item::after{content:'✦';font-size:0.5rem;opacity:0.5}
+@keyframes tick{from{transform:translateX(0)}to{transform:translateX(-50%)}}
+
+/* ── NUMBERS ── */
+.numbers{
+  display:grid;grid-template-columns:repeat(4,1fr);
+  border-bottom:1px solid var(--border);
+}
+.num-item{
+  padding:4rem 5vw;
+  border-right:1px solid var(--border);
+  position:relative;overflow:hidden;
+}
+.num-item:last-child{border-right:none}
+.num-item::before{
+  content:'';position:absolute;bottom:0;left:0;
+  width:0;height:2px;background:var(--gold);
+  transition:width 0.6s ease;
+}
+.num-item:hover::before{width:100%}
+.num-val{
+  font-family:'Italiana',serif;
+  font-size:clamp(2.8rem,5vw,4.5rem);
+  color:var(--cream);line-height:1;margin-bottom:0.5rem;
+  display:flex;align-items:baseline;gap:0.2rem;
+}
+.num-val sup{font-size:40%;color:var(--gold);font-family:'Outfit',sans-serif}
+.num-label{font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+
+/* ── ABOUT ── */
+.about{
+  display:grid;grid-template-columns:1fr 1fr;
+  min-height:90vh;
+}
+.about-left{
+  position:relative;overflow:hidden;
+}
+.about-left img{
+  width:100%;height:100%;object-fit:cover;
+  transition:transform 0.8s ease;
+}
+.about:hover .about-left img{transform:scale(1.04)}
+.about-left-tag{
+  position:absolute;bottom:3rem;left:3rem;
+  background:var(--green);border:1px solid var(--border);
+  padding:1rem 1.5rem;backdrop-filter:blur(12px);
+}
+.about-left-tag strong{
+  font-family:'Italiana',serif;font-size:2rem;
+  color:var(--gold);display:block;
+}
+.about-left-tag span{font-size:0.7rem;letter-spacing:0.15em;text-transform:uppercase;color:var(--muted)}
+.about-right{
+  padding:8rem 5vw;display:flex;flex-direction:column;justify-content:center;
+  background:var(--green2);
+}
+.section-label{
+  font-size:0.65rem;letter-spacing:0.3em;text-transform:uppercase;
+  color:var(--gold);margin-bottom:1.5rem;
+  display:flex;align-items:center;gap:1rem;
+}
+.section-label::before{content:'';width:30px;height:1px;background:var(--gold)}
+.section-h{
+  font-family:'Italiana',serif;
+  font-size:clamp(2.5rem,4.5vw,4rem);
+  line-height:1.05;margin-bottom:2rem;
+}
+.section-h em{color:var(--gold);font-style:italic}
+.about-body{
+  font-size:0.92rem;line-height:1.85;color:var(--muted);margin-bottom:2.5rem;
+}
+.about-body p{margin-bottom:1rem}
+.about-feature{
+  display:flex;gap:1rem;align-items:flex-start;padding:1.2rem 0;
+  border-top:1px solid var(--border);
+}
+.about-feature:last-child{border-bottom:1px solid var(--border)}
+.feature-dot{
+  width:8px;height:8px;border-radius:50%;background:var(--gold);
+  flex-shrink:0;margin-top:0.3rem;
+}
+.feature-text strong{display:block;font-size:0.88rem;font-weight:500;margin-bottom:0.2rem}
+.feature-text span{font-size:0.78rem;color:var(--muted)}
+
+/* ── PORTFOLIO ── */
+.portfolio{padding:6rem 0}
+.port-header{padding:0 5vw;display:flex;justify-content:space-between;align-items:flex-end;margin-bottom:3rem}
+.port-header .section-h{margin-bottom:0}
+.port-link{
+  font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;
+  color:var(--muted);text-decoration:none;
+  display:flex;align-items:center;gap:0.5rem;transition:color 0.3s;
+}
+.port-link:hover{color:var(--cream)}
+/* Horizontal scroll track */
+.port-track-wrap{
+  overflow-x:auto;
+  padding:0 5vw;
+  scrollbar-width:none;
+  -webkit-overflow-scrolling:touch;
+  cursor:grab;
+}
+.port-track-wrap:active{cursor:grabbing}
+.port-track-wrap::-webkit-scrollbar{display:none}
+.port-track{
+  display:flex;gap:16px;width:max-content;padding-bottom:1rem;
+}
+.port-item{
+  flex-shrink:0;position:relative;overflow:hidden;
+  border-radius:2px;
+}
+.port-item img{
+  display:block;height:100%;width:100%;object-fit:cover;
+  transition:transform 0.7s cubic-bezier(0.25,0.46,0.45,0.94);
+}
+.port-item:hover img{transform:scale(1.08)}
+.port-item:nth-child(1){width:480px;height:560px}
+.port-item:nth-child(2){width:320px;height:560px}
+.port-item:nth-child(3){width:420px;height:560px}
+.port-item:nth-child(4){width:360px;height:560px}
+.port-item:nth-child(5){width:400px;height:560px}
+.port-item:nth-child(6){width:300px;height:560px}
+.port-caption{
+  position:absolute;bottom:0;left:0;right:0;
+  padding:2rem 1.5rem 1.5rem;
+  background:linear-gradient(to top,rgba(10,18,12,0.9) 0%,transparent 100%);
+  transform:translateY(20px);opacity:0;
+  transition:transform 0.4s,opacity 0.4s;
+}
+.port-item:hover .port-caption{transform:translateY(0);opacity:1}
+.port-cat{font-size:0.6rem;letter-spacing:0.25em;text-transform:uppercase;color:var(--gold);margin-bottom:0.3rem}
+.port-name{font-family:'Libre Baskerville',serif;font-size:1rem}
+/* Drag hint */
+.drag-hint{
+  padding:1rem 5vw;
+  font-size:0.68rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted);
+  display:flex;align-items:center;gap:0.8rem;margin-top:0.5rem;
+}
+.drag-line{width:24px;height:1px;background:var(--muted)}
+
+/* ── SERVICES ── */
+.services{background:var(--green2);padding:7rem 5vw}
+.services-head{display:grid;grid-template-columns:1fr 1fr;gap:4rem;margin-bottom:4rem}
+.services-head p{color:var(--muted);font-size:0.92rem;line-height:1.8;padding-top:1.5rem}
+.svc-list{display:grid;grid-template-columns:1fr 1fr 1fr;gap:1px;background:var(--border)}
+.svc-item{
+  padding:2.5rem;background:var(--green2);
+  position:relative;overflow:hidden;
+  transition:background 0.4s;
+}
+.svc-item:hover{background:var(--green3)}
+.svc-n{
+  font-family:'Italiana',serif;font-size:5rem;
+  color:rgba(201,161,74,0.08);line-height:1;
+  position:absolute;right:1.5rem;top:1rem;
+}
+.svc-icon{font-size:1.6rem;margin-bottom:1.2rem}
+.svc-name{
+  font-family:'Libre Baskerville',serif;font-size:1.05rem;
+  margin-bottom:0.7rem;font-weight:700;
+}
+.svc-desc{font-size:0.8rem;color:var(--muted);line-height:1.7}
+.svc-item::after{
+  content:'';position:absolute;bottom:0;left:0;
+  width:0;height:1px;background:var(--gold);transition:width 0.5s;
+}
+.svc-item:hover::after{width:100%}
+
+/* ── PACKAGES ── */
+.packages{padding:7rem 5vw;background:var(--green)}
+.pkg-head{text-align:center;margin-bottom:4rem}
+.pkg-head .section-label{justify-content:center}
+.packages-grid{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:1px;
+  background:var(--border);border:1px solid var(--border);
+}
+.pkg{
+  background:var(--green);padding:3rem 2.5rem;position:relative;overflow:hidden;
+  transition:background 0.4s;
+}
+.pkg.hot{background:var(--green2)}
+.pkg:hover{background:var(--green3)}
+.pkg-tag{
+  display:inline-block;font-size:0.6rem;letter-spacing:0.2em;text-transform:uppercase;
+  padding:0.3rem 0.9rem;border:1px solid var(--gold);color:var(--gold);
+  margin-bottom:1.5rem;
+}
+.pkg-tag.pop{background:var(--gold);color:var(--green);border-color:var(--gold)}
+.pkg-name{
+  font-family:'Italiana',serif;font-size:1.8rem;
+  margin-bottom:0.8rem;
+}
+.pkg-price{
+  font-family:'Italiana',serif;font-size:3.5rem;line-height:1;
+  color:var(--cream);margin-bottom:0.4rem;
+  display:flex;align-items:flex-start;gap:0.3rem;
+}
+.pkg-price small{font-family:'Outfit',sans-serif;font-size:1rem;margin-top:0.6rem;color:var(--muted)}
+.pkg-sub{font-size:0.75rem;color:var(--muted);margin-bottom:2rem}
+.pkg-line{height:1px;background:var(--border);margin-bottom:1.8rem}
+.pkg-list{list-style:none;display:flex;flex-direction:column;gap:0.7rem;margin-bottom:2.5rem}
+.pkg-list li{
+  display:flex;align-items:flex-start;gap:0.8rem;
+  font-size:0.83rem;color:var(--muted);line-height:1.5;
+}
+.pkg-list li::before{
+  content:'—';color:var(--gold);flex-shrink:0;font-size:0.9rem;
+}
+.pkg-btn{
+  display:block;text-align:center;text-decoration:none;
+  padding:0.9rem 1.5rem;
+  border:1px solid rgba(201,161,74,0.3);
+  color:var(--cream);font-size:0.72rem;letter-spacing:0.18em;text-transform:uppercase;
+  font-weight:500;transition:all 0.3s;
+}
+.pkg-btn:hover,.pkg-btn.fill{
+  background:var(--gold);border-color:var(--gold);color:var(--green);
+}
+.pkg-bg-num{
+  position:absolute;bottom:-1rem;right:1.5rem;
+  font-family:'Italiana',serif;font-size:10rem;
+  color:rgba(201,161,74,0.04);line-height:1;pointer-events:none;
+  user-select:none;
+}
+
+/* ── TESTIMONIAL ── */
+.testi{
+  background:var(--gold);padding:7rem 5vw;
+  display:grid;grid-template-columns:1fr 2fr;gap:6rem;align-items:center;
+}
+.testi-left .section-label{color:var(--green);opacity:0.6}
+.testi-left .section-label::before{background:var(--green)}
+.testi-left .section-h{color:var(--green)}
+.testi-quote{
+  font-family:'Libre Baskerville',serif;font-style:italic;
+  font-size:clamp(1.3rem,2.5vw,1.9rem);line-height:1.55;
+  color:var(--green);margin-bottom:2rem;
+}
+.testi-quote::before{
+  content:'\201C';font-size:4rem;line-height:0.5;
+  display:block;margin-bottom:1rem;opacity:0.3;
+}
+.testi-author{
+  display:flex;align-items:center;gap:1rem;
+}
+.testi-author img{
+  width:50px;height:50px;border-radius:50%;object-fit:cover;
+  border:2px solid rgba(15,31,18,0.3);
+}
+.testi-author-info strong{display:block;font-size:0.88rem;color:var(--green);font-weight:600}
+.testi-author-info span{font-size:0.72rem;color:rgba(15,31,18,0.6)}
+
+/* ── CONTACT ── */
+.contact{
+  background:var(--green2);padding:7rem 5vw;
+  display:grid;grid-template-columns:1fr 1fr;gap:8rem;
+}
+.contact-left{}
+.contact-left .section-h{margin-bottom:1.5rem}
+.contact-left p{color:var(--muted);font-size:0.9rem;line-height:1.8;margin-bottom:2.5rem}
+.c-links{display:flex;flex-direction:column;gap:0;border-top:1px solid var(--border)}
+.c-link{
+  display:flex;align-items:center;gap:1.5rem;
+  padding:1.2rem 0;border-bottom:1px solid var(--border);
+  text-decoration:none;color:var(--cream);
+  transition:padding 0.3s;
+}
+.c-link:hover{padding-left:0.5rem}
+.c-link-icon{
+  width:40px;height:40px;border:1px solid var(--border);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1rem;flex-shrink:0;
+}
+.c-link-info strong{display:block;font-size:0.85rem;font-weight:500}
+.c-link-info span{font-size:0.72rem;color:var(--muted)}
+.contact-right{}
+.contact-right .section-label{margin-bottom:2rem}
+.form{display:flex;flex-direction:column;gap:1.2rem}
+.f-group{display:flex;flex-direction:column;gap:0.4rem}
+.f-group label{font-size:0.65rem;letter-spacing:0.2em;text-transform:uppercase;color:var(--muted)}
+.f-group input,.f-group textarea,.f-group select{
+  background:transparent;border:none;border-bottom:1px solid var(--border);
+  color:var(--cream);padding:0.7rem 0;font-family:'Outfit',sans-serif;font-size:0.9rem;
+  outline:none;transition:border-color 0.3s;
+  -webkit-appearance:none;
+}
+.f-group input:focus,.f-group textarea:focus,.f-group select:focus{border-color:var(--gold)}
+.f-group select option{background:var(--green2)}
+.f-group textarea{resize:none;height:90px}
+.f-row{display:grid;grid-template-columns:1fr 1fr;gap:1.5rem}
+.f-submit{
+  margin-top:0.5rem;padding:1rem 2rem;
+  background:var(--cream);color:var(--green);
+  border:none;font-family:'Outfit',sans-serif;
+  font-size:0.72rem;letter-spacing:0.2em;text-transform:uppercase;font-weight:600;
+  cursor:pointer;transition:background 0.3s,color 0.3s;align-self:flex-start;
+}
+.f-submit:hover{background:var(--gold);color:var(--green)}
+
+/* ── FOOTER ── */
+footer{
+  padding:3rem 5vw;
+  border-top:1px solid var(--border);
+  display:flex;align-items:center;justify-content:space-between;
+}
+.foot-logo{
+  font-family:'Italiana',serif;font-size:1.4rem;letter-spacing:0.1em;
+  color:var(--cream);text-decoration:none;
+}
+.foot-mid{font-size:0.7rem;color:var(--muted);letter-spacing:0.15em;text-transform:uppercase}
+.foot-credit{font-size:0.7rem;color:var(--muted)}
+.foot-credit a{color:var(--gold);text-decoration:none}
+
+/* ── WA FLOAT ── */
+.wa{
+  position:fixed;bottom:2.5rem;right:2.5rem;z-index:500;
+  width:54px;height:54px;border-radius:50%;
+  background:#25D366;color:#fff;
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.5rem;text-decoration:none;
+  box-shadow:0 0 0 0 rgba(37,211,102,0.4);
+  animation:waping 2.5s infinite;
+}
+@keyframes waping{
+  0%{box-shadow:0 0 0 0 rgba(37,211,102,0.4)}
+  70%{box-shadow:0 0 0 16px rgba(37,211,102,0)}
+  100%{box-shadow:0 0 0 0 rgba(37,211,102,0)}
+}
+
+/* ── REVEAL ── */
+.r{opacity:0;transform:translateY(28px);transition:opacity 0.8s,transform 0.8s}
+.r.on{opacity:1;transform:translateY(0)}
+.r-d1{transition-delay:0.1s}
+.r-d2{transition-delay:0.2s}
+.r-d3{transition-delay:0.3s}
+.r-d4{transition-delay:0.4s}
+
+/* ── RESPONSIVE ── */
+@media(max-width:900px){
+  nav{padding:1.5rem 5vw}
+  .nav-right{gap:1.5rem}
+  .nav-link{display:none}
+  .hero-badge{display:none}
+  .hero-content{flex-direction:column;align-items:flex-start;gap:1.5rem}
+  .hero-right{text-align:left;max-width:100%}
+  .numbers{grid-template-columns:1fr 1fr}
+  .num-item{padding:2.5rem 5vw}
+  .about{grid-template-columns:1fr}
+  .about-left{height:350px}
+  .services-head{grid-template-columns:1fr;gap:1rem}
+  .svc-list{grid-template-columns:1fr 1fr}
+  .packages-grid{grid-template-columns:1fr}
+  .packages-grid .pkg{border-right:none!important}
+  .testi{grid-template-columns:1fr;gap:2rem}
+  .contact{grid-template-columns:1fr;gap:4rem}
+  footer{flex-direction:column;gap:1rem;text-align:center}
+}
+</style>
+</head>
+<body>
+
+<div id="cur"></div>
+<div id="cur2"></div>
+
+<!-- NAV -->
+<nav>
+  <a href="#" class="logo">LiB Production</a>
+  <div class="nav-right">
+    <a href="#portfolio" class="nav-link">Work</a>
+    <a href="#services" class="nav-link">Services</a>
+    <a href="#packages" class="nav-link">Packages</a>
+    <a href="#contact" class="nav-cta">Book Now</a>
+  </div>
+</nav>
+
+<!-- HERO -->
+<section class="hero">
+  <div class="hero-bg">
+    <div class="slide active"><img src="https://images.unsplash.com/photo-1519741347686-c1e331fcfa85?w=1600&q=85" alt="Wedding"></div>
+    <div class="slide"><img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=1600&q=85" alt="Ceremony"></div>
+    <div class="slide"><img src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=1600&q=85" alt="Pre-Wedding"></div>
+    <div class="slide"><img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=1600&q=85" alt="Couple"></div>
+    <div class="slide"><img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=1600&q=85" alt="Reception"></div>
+  </div>
+  <div class="hero-overlay"></div>
+  <div class="slide-dots">
+    <button class="slide-dot on" onclick="goSlide(0)"></button>
+    <button class="slide-dot" onclick="goSlide(1)"></button>
+    <button class="slide-dot" onclick="goSlide(2)"></button>
+    <button class="slide-dot" onclick="goSlide(3)"></button>
+    <button class="slide-dot" onclick="goSlide(4)"></button>
+  </div>
+  <div class="slide-counter" id="slideCounter">01 / 05</div>
+  <div class="hero-content">
+    <div class="hero-title-wrap">
+      <div class="hero-eyebrow">📍 Bhiwandi · Mumbai · Pan-India</div>
+      <h1 class="hero-title">
+        <span class="line"><span>We Don't</span></span>
+        <span class="line"><span>Just Shoot,</span></span>
+        <span class="line"><span>We Feel.</span></span>
+      </h1>
+    </div>
+    <div class="hero-right">
+      <p>LiB Production — Premium wedding & event photography and cinematography. Every frame carries a heartbeat.</p>
+      <div class="hero-scroll">
+        <div class="hero-scroll-line"></div>
+        Scroll to explore
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MARQUEE -->
+<div class="ticker">
+  <div class="ticker-inner">
+    <div class="ticker-item">Wedding Photography</div>
+    <div class="ticker-item">Pre-Wedding Shoots</div>
+    <div class="ticker-item">Cinematic Films</div>
+    <div class="ticker-item">Event Coverage</div>
+    <div class="ticker-item">Drone Cinematography</div>
+    <div class="ticker-item">Brand Photography</div>
+    <div class="ticker-item">Wedding Photography</div>
+    <div class="ticker-item">Pre-Wedding Shoots</div>
+    <div class="ticker-item">Cinematic Films</div>
+    <div class="ticker-item">Event Coverage</div>
+    <div class="ticker-item">Drone Cinematography</div>
+    <div class="ticker-item">Brand Photography</div>
+  </div>
+</div>
+
+<!-- NUMBERS -->
+<div class="numbers">
+  <div class="num-item r">
+    <div class="num-val">500<sup>+</sup></div>
+    <div class="num-label">Weddings Shot</div>
+  </div>
+  <div class="num-item r r-d1">
+    <div class="num-val">2000<sup>+</sup></div>
+    <div class="num-label">Happy Clients</div>
+  </div>
+  <div class="num-item r r-d2">
+    <div class="num-val">5<sup>+</sup></div>
+    <div class="num-label">Years Active</div>
+  </div>
+  <div class="num-item r r-d3">
+    <div class="num-val">98<sup>%</sup></div>
+    <div class="num-label">Satisfaction Rate</div>
+  </div>
+</div>
+
+<!-- ABOUT -->
+<section class="about" id="about">
+  <div class="about-left">
+    <img src="https://images.unsplash.com/photo-1606800052052-a08af7148866?w=900&q=85" alt="LiB Photography">
+    <div class="about-left-tag r">
+      <strong>Est. 2020</strong>
+      <span>Bhiwandi, Maharashtra</span>
+    </div>
+  </div>
+  <div class="about-right">
+    <div class="section-label r">Our Story</div>
+    <h2 class="section-h r r-d1">Crafted by <em>Passion,</em><br>Delivered with Love</h2>
+    <div class="about-body r r-d2">
+      <p>LiB Production started with one camera and one dream — to tell real stories. Today we're one of the most trusted names in wedding and event photography across Mumbai and Bhiwandi.</p>
+      <p>We believe the best photos happen between the poses — in the tears, the laughter, the chaos, and the calm.</p>
+    </div>
+    <div class="about-feature r r-d3">
+      <div class="feature-dot"></div>
+      <div class="feature-text">
+        <strong>Candid + Traditional Coverage</strong>
+        <span>We capture both styled portraits and raw, real moments</span>
+      </div>
+    </div>
+    <div class="about-feature r r-d4">
+      <div class="feature-dot"></div>
+      <div class="feature-text">
+        <strong>Cinematic Video Production</strong>
+        <span>Drone, slow-mo, and film-grade color grading</span>
+      </div>
+    </div>
+    <div class="about-feature r">
+      <div class="feature-dot"></div>
+      <div class="feature-text">
+        <strong>Fast Delivery, Zero Compromise</strong>
+        <span>Edited gallery delivered within 2–3 weeks</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- PORTFOLIO -->
+<section class="portfolio" id="portfolio">
+  <div class="port-header">
+    <div>
+      <div class="section-label r">Our Work</div>
+      <h2 class="section-h r r-d1">Stories in Frames</h2>
+    </div>
+    <a href="#contact" class="port-link r r-d2">Book a session →</a>
+  </div>
+  <div class="port-track-wrap" id="portTrack">
+    <div class="port-track">
+      <div class="port-item">
+        <img src="https://images.unsplash.com/photo-1465495976277-4387d4b0b4c6?w=900&q=85" alt="Wedding">
+        <div class="port-caption"><div class="port-cat">Wedding</div><div class="port-name">Rohan & Priya — Mumbai</div></div>
+      </div>
+      <div class="port-item">
+        <img src="https://images.unsplash.com/photo-1537633552985-df8429e8048b?w=700&q=85" alt="Pre Wedding">
+        <div class="port-caption"><div class="port-cat">Pre-Wedding</div><div class="port-name">Golden Hour — Lonavala</div></div>
+      </div>
+      <div class="port-item">
+        <img src="https://images.unsplash.com/photo-1511285560929-80b456fea0bc?w=800&q=85" alt="Reception">
+        <div class="port-caption"><div class="port-cat">Reception</div><div class="port-name">The Grand Walima</div></div>
+      </div>
+      <div class="port-item">
+        <img src="https://images.unsplash.com/photo-1583939003579-730e3918a45a?w=750&q=85" alt="Engagement">
+        <div class="port-caption"><div class="port-cat">Engagement</div><div class="port-name">Aditi & Karan — Thane</div></div>
+      </div>
+      <div class="port-item">
+        <img src="https://images.unsplash.com/photo-1501281668745-f7f57925c3b4?w=800&q=85" alt="Event">
+        <div class="port-caption"><div class="port-cat">Event</div><div class="port-name">Grand Sangeet Night</div></div>
+      </div>
+      <div class="port-item">
+        <img src="https://images.unsplash.com/photo-1522673607200-164d1b6ce486?w=650&q=85" alt="Portrait">
+        <div class="port-caption"><div class="port-cat">Portrait</div><div class="port-name">Bride Portraits — Studio</div></div>
+      </div>
+    </div>
+  </div>
+  <div class="drag-hint">
+    <div class="drag-line"></div>
+    Drag to explore
+  </div>
+</section>
+
+<!-- SERVICES -->
+<section class="services" id="services">
+  <div class="services-head">
+    <div>
+      <div class="section-label r">Services</div>
+      <h2 class="section-h r r-d1">What We<br><em>Offer</em></h2>
+    </div>
+    <p class="r r-d2">From intimate ceremonies to grand receptions, from personal portraits to commercial brand shoots — we bring our full creative vision and technical expertise to every project.</p>
+  </div>
+  <div class="svc-list">
+    <div class="svc-item r">
+      <div class="svc-n">01</div>
+      <div class="svc-icon">💍</div>
+      <div class="svc-name">Wedding Photography</div>
+      <div class="svc-desc">Full day coverage, candid moments, traditional portraits — everything from Mehndi to Vidaai.</div>
+    </div>
+    <div class="svc-item r r-d1">
+      <div class="svc-n">02</div>
+      <div class="svc-icon">🎬</div>
+      <div class="svc-name">Cinematic Films</div>
+      <div class="svc-desc">Drone shots, slow motion, cinema-grade grading. Your wedding as a feature film.</div>
+    </div>
+    <div class="svc-item r r-d2">
+      <div class="svc-n">03</div>
+      <div class="svc-icon">💫</div>
+      <div class="svc-name">Pre-Wedding Shoots</div>
+      <div class="svc-desc">Creative, romantic, fun. Location shoots designed to tell your love story.</div>
+    </div>
+    <div class="svc-item r">
+      <div class="svc-n">04</div>
+      <div class="svc-icon">🎉</div>
+      <div class="svc-name">Event Coverage</div>
+      <div class="svc-desc">Birthdays, sangeet nights, corporate galas. Professional coverage for every occasion.</div>
+    </div>
+    <div class="svc-item r r-d1">
+      <div class="svc-n">05</div>
+      <div class="svc-icon">📸</div>
+      <div class="svc-name">Studio Portraits</div>
+      <div class="svc-desc">Professional portraits for individuals, families, and professional profiles.</div>
+    </div>
+    <div class="svc-item r r-d2">
+      <div class="svc-n">06</div>
+      <div class="svc-icon">🏢</div>
+      <div class="svc-name">Brand Photography</div>
+      <div class="svc-desc">Product shoots, campaigns, and commercial content that elevates your brand.</div>
+    </div>
+  </div>
+</section>
+
+<!-- PACKAGES -->
+<section class="packages" id="packages">
+  <div class="pkg-head">
+    <div class="section-label r">Pricing</div>
+    <h2 class="section-h r r-d1">Simple Packages,<br>Honest Pricing</h2>
+  </div>
+  <div class="packages-grid">
+    <div class="pkg r">
+      <div class="pkg-bg-num">01</div>
+      <div class="pkg-tag">Starter</div>
+      <div class="pkg-name">Basic</div>
+      <div class="pkg-price"><small>₹</small>3,999</div>
+      <div class="pkg-sub">Small events, portraits, and functions</div>
+      <div class="pkg-line"></div>
+      <ul class="pkg-list">
+        <li>4 Hours of Coverage</li>
+        <li>200+ Edited Photos</li>
+        <li>1 Photographer</li>
+        <li>Online Gallery Delivery</li>
+        <li>WhatsApp Delivery</li>
+      </ul>
+      <a href="https://wa.me/91XXXXXXXXXX" class="pkg-btn">Book This</a>
+    </div>
+    <div class="pkg hot r r-d1">
+      <div class="pkg-bg-num">02</div>
+      <div class="pkg-tag pop">Most Popular</div>
+      <div class="pkg-name">Standard</div>
+      <div class="pkg-price"><small>₹</small>6,999</div>
+      <div class="pkg-sub">Full wedding & event coverage</div>
+      <div class="pkg-line"></div>
+      <ul class="pkg-list">
+        <li>Full Day Coverage (10 hrs)</li>
+        <li>500+ Edited Photos</li>
+        <li>Cinematic Highlight Film (5 min)</li>
+        <li>2 Photographers + 1 Videographer</li>
+        <li>Drone Coverage (1 location)</li>
+        <li>Premium Gallery</li>
+      </ul>
+      <a href="https://wa.me/91XXXXXXXXXX" class="pkg-btn fill">Book This</a>
+    </div>
+    <div class="pkg r r-d2">
+      <div class="pkg-bg-num">03</div>
+      <div class="pkg-tag" style="border-color:var(--gold2);color:var(--gold2)">Luxury</div>
+      <div class="pkg-name">Premium</div>
+      <div class="pkg-price"><small>₹</small>11,999</div>
+      <div class="pkg-sub">Complete production experience</div>
+      <div class="pkg-line"></div>
+      <ul class="pkg-list">
+        <li>2 Days Full Coverage</li>
+        <li>1000+ Edited Photos</li>
+        <li>Feature Film (15–20 min)</li>
+        <li>Drone Coverage (Unlimited)</li>
+        <li>Pre-Wedding Shoot Included</li>
+        <li>Physical Photo Book</li>
+        <li>Same-Day Edit Reels</li>
+      </ul>
+      <a href="https://wa.me/91XXXXXXXXXX" class="pkg-btn">Book This</a>
+    </div>
+  </div>
+</section>
+
+<!-- TESTIMONIAL -->
+<section class="testi">
+  <div class="testi-left r">
+    <div class="section-label">Testimonials</div>
+    <h2 class="section-h">What<br>Clients<br>Say</h2>
+  </div>
+  <div class="r r-d2">
+    <blockquote class="testi-quote">
+      LiB Production captured every emotion of our wedding day. The highlight film made us cry every time we watched it. They are not just photographers — they are storytellers.
+    </blockquote>
+    <div class="testi-author">
+      <img src="https://images.unsplash.com/photo-1531746020798-e6953c6e8e04?w=100&q=80" alt="Client">
+      <div class="testi-author-info">
+        <strong>Ayesha & Farhan</strong>
+        <span>Wedding Client — Mumbai, 2024</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- CONTACT -->
+<section class="contact" id="contact">
+  <div class="contact-left">
+    <div class="section-label r">Get In Touch</div>
+    <h2 class="section-h r r-d1">Let's Make<br>Something<br><em>Beautiful</em></h2>
+    <p class="r r-d2">Reach out on WhatsApp for the fastest response. We'd love to be part of your story.</p>
+    <div class="c-links r r-d3">
+      <a href="https://wa.me/91XXXXXXXXXX" class="c-link">
+        <div class="c-link-icon">💬</div>
+        <div class="c-link-info">
+          <strong>WhatsApp</strong>
+          <span>+91 XXXXX XXXXX · Fastest Response</span>
+        </div>
+      </a>
+      <a href="https://instagram.com/libproduction" class="c-link">
+        <div class="c-link-icon">📸</div>
+        <div class="c-link-info">
+          <strong>Instagram</strong>
+          <span>@libproduction · 2.2K Followers</span>
+        </div>
+      </a>
+      <div class="c-link">
+        <div class="c-link-icon">📍</div>
+        <div class="c-link-info">
+          <strong>Location</strong>
+          <span>Bhiwandi · Mumbai · Pan-India</span>
+        </div>
+      </div>
+    </div>
+  </div>
+  <div class="r r-d2">
+    <div class="section-label">Quick Enquiry</div>
+    <div class="form">
+      <div class="f-row">
+        <div class="f-group"><label>Name</label><input type="text" placeholder="Your Name" id="f-name"></div>
+        <div class="f-group"><label>Phone</label><input type="tel" placeholder="+91 99999 99999" id="f-phone"></div>
+      </div>
+      <div class="f-group">
+        <label>Event Type</label>
+        <select id="f-event">
+          <option>Select Event</option>
+          <option>Wedding Photography</option>
+          <option>Pre-Wedding Shoot</option>
+          <option>Birthday / Party</option>
+          <option>Corporate Event</option>
+          <option>Brand Photography</option>
+          <option>Other</option>
+        </select>
+      </div>
+      <div class="f-row">
+        <div class="f-group"><label>Event Date</label><input type="date" id="f-date"></div>
+        <div class="f-group">
+          <label>Package</label>
+          <select id="f-pkg">
+            <option>Select Package</option>
+            <option>Basic — ₹3,999</option>
+            <option>Standard — ₹6,999</option>
+            <option>Premium — ₹11,999</option>
+            <option>Custom Budget</option>
+          </select>
+        </div>
+      </div>
+      <div class="f-group"><label>Message</label><textarea id="f-msg" placeholder="Tell us about your event..."></textarea></div>
+      <button class="f-submit" onclick="sendWA()">Send via WhatsApp →</button>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer>
+  <a href="#" class="foot-logo">LiB Production</a>
+  <div class="foot-mid">© 2025 · Bhiwandi, Maharashtra</div>
+  <div class="foot-credit">Concept by <a href="https://www.mfydesigns.in" target="_blank">mfydesigns.in</a></div>
+</footer>
+
+<a href="https://wa.me/91XXXXXXXXXX" class="wa" title="WhatsApp">💬</a>
+
+<script>
+// Cursor
+const c=document.getElementById('cur'),c2=document.getElementById('cur2');
+let mx=0,my=0,fx=0,fy=0;
+document.addEventListener('mousemove',e=>{
+  mx=e.clientX;my=e.clientY;
+  c.style.left=mx+'px';c.style.top=my+'px';
+});
+!(function loop(){
+  fx+=(mx-fx)*0.12;fy+=(my-fy)*0.12;
+  c2.style.left=fx+'px';c2.style.top=fy+'px';
+  requestAnimationFrame(loop);
+})();
+document.querySelectorAll('a,button,.pkg,.svc-item,.port-item').forEach(el=>{
+  el.addEventListener('mouseenter',()=>{c.style.transform='translate(-50%,-50%) scale(2.5)';c2.style.transform='translate(-50%,-50%) scale(1.5)'});
+  el.addEventListener('mouseleave',()=>{c.style.transform='translate(-50%,-50%) scale(1)';c2.style.transform='translate(-50%,-50%) scale(1)'});
+});
+
+// Slideshow
+let cur=0;
+const slides=document.querySelectorAll('.slide');
+const dots=document.querySelectorAll('.slide-dot');
+const counter=document.getElementById('slideCounter');
+function goSlide(n){
+  slides[cur].classList.remove('active');
+  dots[cur].classList.remove('on');
+  cur=n;
+  slides[cur].classList.add('active');
+  dots[cur].classList.add('on');
+  counter.textContent=String(cur+1).padStart(2,'0')+' / 0'+slides.length;
+}
+setInterval(()=>goSlide((cur+1)%slides.length),5000);
+
+// Scroll reveal
+const obs=new IntersectionObserver(entries=>{
+  entries.forEach(e=>{if(e.isIntersecting)e.target.classList.add('on')});
+},{threshold:0.1});
+document.querySelectorAll('.r').forEach(el=>obs.observe(el));
+
+// Drag scroll portfolio
+const track=document.getElementById('portTrack');
+let dragging=false,sx=0,sl=0;
+track.addEventListener('mousedown',e=>{dragging=true;sx=e.pageX;sl=track.scrollLeft;track.style.userSelect='none'});
+document.addEventListener('mousemove',e=>{if(!dragging)return;track.scrollLeft=sl-(e.pageX-sx)});
+document.addEventListener('mouseup',()=>{dragging=false;track.style.userSelect=''});
+track.addEventListener('touchstart',e=>{sx=e.touches[0].pageX;sl=track.scrollLeft});
+track.addEventListener('touchmove',e=>{track.scrollLeft=sl-(e.touches[0].pageX-sx)});
+
+// WA form
+function sendWA(){
+  const name=document.getElementById('f-name').value||'Enquiry';
+  const phone=document.getElementById('f-phone').value||'N/A';
+  const ev=document.getElementById('f-event').value;
+  const pkg=document.getElementById('f-pkg').value;
+  const date=document.getElementById('f-date').value||'Not specified';
+  const msg=document.getElementById('f-msg').value||'';
+  const text=`Hi LiB Production! 🙏\n\nName: ${name}\nPhone: ${phone}\nEvent: ${ev}\nDate: ${date}\nPackage: ${pkg}\n${msg?'Message: '+msg:''}\n\n(Sent from website)`;
+  window.open('https://wa.me/91XXXXXXXXXX?text='+encodeURIComponent(text),'_blank');
+}
+</script>
+</body>
+</html>
